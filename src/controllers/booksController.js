@@ -1,84 +1,90 @@
 import books from "../models/Book.js";
 
 class BooksController {
-  static listBooks = (req, res) => {
-    books
-      .find()
-      .populate("writer")
-      .exec((err, books) => {
-        res.status(200).json(books);
-      });
+  static listBooks = async (req, res) => {
+    try {
+      const booksRes = await books.find().populate("writer").exec();
+
+      res.status(200).json(booksRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static listEspecificBook = (req, res) => {
-    const { id } = req.params;
+  static listEspecificBook = async (req, res) => {
+    try {
+      const { id } = req.params;
 
-    books
-      .findById(id)
-      .populate("writer")
-      .exec((err, book) => {
-        if (err) return res.status(500).json(err);
+      const booksRes = await books.findById(id).populate("writer").exec();
 
-        return res.status(200).json(book);
-      });
+      return res.status(200).json(booksRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static searchBooks = (req, res) => {
-    const { publisher, title } = req.query;
+  static searchBooks = async (req, res) => {
+    try {
+      const { publisher, title } = req.query;
 
-    const newPublisher = publisher || "";
-    const newTitle = title || "";
+      const newPublisher = publisher || "";
+      const newTitle = title || "";
 
-    books.find(
-      {
+      const booksRes = await books.find({
         publisher: { $regex: ".*" + newPublisher + ".*", $options: "i" },
         title: { $regex: ".*" + newTitle + ".*", $options: "i" },
-      },
-      {},
-      (err, books) => {
-        if (err) return res.status(500).json(err);
+      });
 
-        return res.status(200).json(books);
-      }
-    );
+      return res.status(200).json(booksRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static createNewBook = (req, res) => {
-    const body = req.body;
+  static createNewBook = async (req, res) => {
+    try {
+      const body = req.body;
 
-    const newBook = {
-      title: body.title,
-      writer: body.writer,
-      publisher: body.publisher,
-      numberOfPages: body.numberOfPages || null,
-    };
+      const newBook = {
+        title: body.title,
+        writer: body.writer,
+        publisher: body.publisher,
+        numberOfPages: body.numberOfPages || null,
+      };
 
-    books.create(newBook, (err, book) => {
-      if (err) return res.status(500).json(err);
-
-      return res.status(201).json(book);
-    });
+      const bookRes = await books.create(newBook);
+      return res.status(201).json(bookRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static updateBook = (req, res) => {
-    const { id } = req.params;
-    const body = req.body;
+  static updateBook = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const body = req.body;
 
-    books.findOneAndUpdate({ _id: id }, { $set: body }, (err, book) => {
-      if (err) return res.status(500).json(err);
+      const booksRes = await books.findOneAndUpdate(
+        { _id: id },
+        { $set: body }
+      );
 
-      return res.status(201).json(book);
-    });
+      return res.status(201).json(booksRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static deleteBook = (req, res) => {
-    const { id } = req.params;
+  static deleteBook = async (req, res) => {
+    try {
+      const { id } = req.params;
 
-    books.findOneAndDelete({ _id: id }, (err, book) => {
-      if (err) return res.status(500).json(err);
+      const booksRes = await books.findOneAndDelete({ _id: id });
 
-      return res.status(201).json(book);
-    });
+      return res.status(201).json(booksRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 }
 
