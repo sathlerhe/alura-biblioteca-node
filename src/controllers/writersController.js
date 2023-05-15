@@ -1,67 +1,78 @@
 import writers from "../models/Writer.js";
 
 class WritersController {
-  static listWriters = (req, res) => {
-    writers.find((err, writers) => {
-      res.status(200).json(writers);
-    });
+  static listWriters = async (req, res) => {
+    try {
+      const writersRes = await writers.find();
+
+      res.status(200).json(writersRes);
+    } catch (err) {
+      return res.status(500).json({ message: "Erro interno no servidor" });
+    }
   };
 
-  static listEspecificWriter = (req, res) => {
-    const { id } = req.params;
+  static listEspecificWriter = async (req, res) => {
+    try {
+      const { id } = req.params;
 
-    writers.findById(id, (err, writer) => {
-      if (err) return res.status(500).json(err);
+      const writersRes = await writers.findById(id);
 
-      return res.status(200).json(writer);
-    });
+      return res.status(200).json(writersRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static searchWriters = (req, res) => {
-    const { name } = req.query;
+  static searchWriters = async (req, res) => {
+    try {
+      const { name } = req.query;
 
-    writers.find(
-      {
+      const writersRes = await writers.find({
         name: { $regex: ".*" + name + ".*", $options: "i" },
-      },
-      {},
-      (err, writers) => {
-        if (err) return res.status(500).json(err);
+      });
 
-        return res.status(200).json(writers);
-      }
-    );
+      return res.status(200).json(writersRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static createNewWriter = (req, res) => {
-    const body = req.body;
+  static createNewWriter = async (req, res) => {
+    try {
+      const body = req.body;
 
-    writers.create({ ...body }, (err, writer) => {
-      if (err) return res.status(500).json(err);
+      const writersRes = await writers.create({ ...body });
 
-      return res.status(201).json(writer);
-    });
+      return res.status(201).json(writersRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static updateWriter = (req, res) => {
-    const { id } = req.params;
-    const body = req.body;
+  static updateWriter = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const body = req.body;
 
-    writers.findOneAndUpdate({ _id: id }, { $set: body }, (err, writer) => {
-      if (err) return res.status(500).json(err);
+      const writersRes = await writers.findOneAndUpdate(
+        { _id: id },
+        { $set: body }
+      );
 
-      return res.status(201).json(writer);
-    });
+      return res.status(201).json(writersRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 
-  static deleteWriter = (req, res) => {
-    const { id } = req.params;
-
-    writers.findOneAndDelete({ _id: id }, (err, writer) => {
-      if (err) return res.status(500).json(err);
-
-      return res.status(201).json(writer);
-    });
+  static deleteWriter = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const writersRes = await writers.findOneAndDelete({ _id: id });
+      return res.status(201).json(writersRes);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   };
 }
 
