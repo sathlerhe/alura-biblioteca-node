@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import writers from "../models/Writer.js";
 
 class WritersController {
@@ -16,9 +17,19 @@ class WritersController {
       const { id } = req.params;
 
       const writersRes = await writers.findById(id);
-
-      return res.status(200).json(writersRes);
+      
+      if (writersRes !== null) {
+        return res.status(200).json(writersRes);
+      } else {
+        return res.status(404).send({ message: "Id do autor não localizado" });
+      }
     } catch (err) {
+      if (err instanceof mongoose.Error.CastError) {
+        return res
+          .status(400)
+          .send({ message: "Um ou mais dados fornecidos estão incorretos." });
+      }
+
       return res.status(500).json(err);
     }
   };
