@@ -1,17 +1,17 @@
 import books from "../models/Book.js";
 
 class BooksController {
-  static listBooks = async (req, res) => {
+  static listBooks = async (req, res, next) => {
     try {
       const booksRes = await books.find().populate("writer").exec();
 
       res.status(200).json(booksRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static listEspecificBook = async (req, res) => {
+  static listEspecificBook = async (req, res, next) => {
     try {
       const { id } = req.params;
 
@@ -19,11 +19,11 @@ class BooksController {
 
       return res.status(200).json(booksRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static searchBooks = async (req, res) => {
+  static searchBooks = async (req, res, next) => {
     try {
       const { publisher, title } = req.query;
 
@@ -37,11 +37,11 @@ class BooksController {
 
       return res.status(200).json(booksRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static createNewBook = async (req, res) => {
+  static createNewBook = async (req, res, next) => {
     try {
       const body = req.body;
 
@@ -55,11 +55,11 @@ class BooksController {
       const bookRes = await books.create(newBook);
       return res.status(201).json(bookRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static updateBook = async (req, res) => {
+  static updateBook = async (req, res, next) => {
     try {
       const { id } = req.params;
       const body = req.body;
@@ -71,11 +71,11 @@ class BooksController {
 
       return res.status(201).json(booksRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static deleteBook = async (req, res) => {
+  static deleteBook = async (req, res, next) => {
     try {
       const { id } = req.params;
 
@@ -83,7 +83,7 @@ class BooksController {
 
       return res.status(201).json(booksRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 }

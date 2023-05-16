@@ -1,40 +1,33 @@
-import mongoose from "mongoose";
 import writers from "../models/Writer.js";
 
 class WritersController {
-  static listWriters = async (req, res) => {
+  static listWriters = async (req, res, next) => {
     try {
       const writersRes = await writers.find();
 
       res.status(200).json(writersRes);
     } catch (err) {
-      return res.status(500).json({ message: "Erro interno no servidor" });
+      next(err);
     }
   };
 
-  static listEspecificWriter = async (req, res) => {
+  static listEspecificWriter = async (req, res, next) => {
     try {
       const { id } = req.params;
 
       const writersRes = await writers.findById(id);
-      
+
       if (writersRes !== null) {
         return res.status(200).json(writersRes);
       } else {
         return res.status(404).send({ message: "Id do autor não localizado" });
       }
     } catch (err) {
-      if (err instanceof mongoose.Error.CastError) {
-        return res
-          .status(400)
-          .send({ message: "Um ou mais dados fornecidos estão incorretos." });
-      }
-
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static searchWriters = async (req, res) => {
+  static searchWriters = async (req, res, next) => {
     try {
       const { name } = req.query;
 
@@ -44,11 +37,11 @@ class WritersController {
 
       return res.status(200).json(writersRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static createNewWriter = async (req, res) => {
+  static createNewWriter = async (req, res, next) => {
     try {
       const body = req.body;
 
@@ -56,11 +49,11 @@ class WritersController {
 
       return res.status(201).json(writersRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static updateWriter = async (req, res) => {
+  static updateWriter = async (req, res, next) => {
     try {
       const { id } = req.params;
       const body = req.body;
@@ -72,17 +65,17 @@ class WritersController {
 
       return res.status(201).json(writersRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next(err);
     }
   };
 
-  static deleteWriter = async (req, res) => {
+  static deleteWriter = async (req, res, next) => {
     try {
       const { id } = req.params;
       const writersRes = await writers.findOneAndDelete({ _id: id });
       return res.status(201).json(writersRes);
     } catch (err) {
-      return res.status(500).json(err);
+      next()
     }
   };
 }
