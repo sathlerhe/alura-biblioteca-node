@@ -1,3 +1,4 @@
+import NotFoundError from "../errors/NotFoundError.js";
 import writers from "../models/Writer.js";
 
 class WritersController {
@@ -17,11 +18,9 @@ class WritersController {
 
       const writersRes = await writers.findById(id);
 
-      if (writersRes !== null) {
-        return res.status(200).json(writersRes);
-      } else {
-        return res.status(404).send({ message: "Id do autor não localizado" });
-      }
+      if (writersRes !== null) return res.status(200).json(writersRes);
+
+      return next(new NotFoundError("Writer id not found"));
     } catch (err) {
       next(err);
     }
@@ -63,7 +62,9 @@ class WritersController {
         { $set: body }
       );
 
-      return res.status(201).json(writersRes);
+      if (writersRes !== null) return res.status(201).json(writersRes);
+
+      return next(new NotFoundError("Writer id not found"));
     } catch (err) {
       next(err);
     }
@@ -73,9 +74,12 @@ class WritersController {
     try {
       const { id } = req.params;
       const writersRes = await writers.findOneAndDelete({ _id: id });
-      return res.status(201).json(writersRes);
+      
+      if (writersRes !== null) return res.status(201).json(writersRes);
+
+      return next(new NotFoundError("Writer id not found"));
     } catch (err) {
-      next()
+      next(err);
     }
   };
 }

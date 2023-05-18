@@ -1,3 +1,4 @@
+import NotFoundError from "../errors/NotFoundError.js";
 import books from "../models/Book.js";
 
 class BooksController {
@@ -17,7 +18,9 @@ class BooksController {
 
       const booksRes = await books.findById(id).populate("writer").exec();
 
-      return res.status(200).json(booksRes);
+      if (booksRes !== null) return res.status(200).json(booksRes);
+
+      return next(new NotFoundError("Book id not found"));
     } catch (err) {
       next(err);
     }
@@ -69,7 +72,9 @@ class BooksController {
         { $set: body }
       );
 
-      return res.status(201).json(booksRes);
+      if (booksRes !== null) return res.status(201).json(booksRes);
+
+      return next(new NotFoundError("Book id not found"));
     } catch (err) {
       next(err);
     }
@@ -81,7 +86,9 @@ class BooksController {
 
       const booksRes = await books.findOneAndDelete({ _id: id });
 
-      return res.status(201).json(booksRes);
+      if (booksRes !== null) return res.status(201).json(booksRes);
+
+      return next(new NotFoundError("Book id not found"));
     } catch (err) {
       next(err);
     }
