@@ -7,5 +7,12 @@ export function errorHandler(error, req, res, next) {
       .send({ message: "Um ou mais dados fornecidos estão incorretos." });
   }
 
-  return res.status(500).json(err);
+  if (error instanceof mongoose.Error.ValidationError) {
+    const errorMessage = Object.values(error.errors)
+      .map(err => err.message)
+
+    return res.status(400).send({ message: errorMessage })
+  }
+
+  return res.status(500).json(error);
 }
