@@ -1,18 +1,16 @@
 import mongoose from "mongoose";
+import BaseError from "../errors/BaseError.js";
+import IncorrectRequest from "../errors/IncorrectRequest.js";
+import ValidationError from "../errors/ValidationError.js";
 
 export function errorHandler(error, req, res, next) {
   if (error instanceof mongoose.Error.CastError) {
-    return res
-      .status(400)
-      .send({ message: "Um ou mais dados fornecidos estão incorretos." });
+    new IncorrectRequest().sendResponse(res);
   }
 
   if (error instanceof mongoose.Error.ValidationError) {
-    const errorMessage = Object.values(error.errors)
-      .map(err => err.message)
-
-    return res.status(400).send({ message: errorMessage })
+    return new ValidationError(error).sendResponse(res)
   }
 
-  return res.status(500).json(error);
+  return new BaseError().sendResponse(res);
 }
