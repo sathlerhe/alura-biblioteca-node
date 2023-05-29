@@ -1,5 +1,5 @@
 import NotFoundError from "../errors/NotFoundError.js";
-import books from "../models/Book.js";
+import { books } from "../models/index.js";
 
 class BooksController {
   static listBooks = async (req, res, next) => {
@@ -52,7 +52,7 @@ class BooksController {
         title: body.title,
         writer: body.writer,
         publisher: body.publisher,
-        numberOfPages: body.numberOfPages || null,
+        numberOfPages: body.numberOfPages,
       };
 
       const bookRes = await books.create(newBook);

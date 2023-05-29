@@ -1,5 +1,5 @@
 import NotFoundError from "../errors/NotFoundError.js";
-import writers from "../models/Writer.js";
+import { writers } from "../models/index.js";
 
 class WritersController {
   static listWriters = async (req, res, next) => {
@@ -74,7 +74,7 @@ class WritersController {
     try {
       const { id } = req.params;
       const writersRes = await writers.findOneAndDelete({ _id: id });
-      
+
       if (writersRes !== null) return res.status(201).json(writersRes);
 
       return next(new NotFoundError("Writer id not found"));
