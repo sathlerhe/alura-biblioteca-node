@@ -1,5 +1,5 @@
 import NotFoundError from "../errors/NotFoundError.js";
-import { books } from "../models/index.js";
+import { books, writers } from "../models/index.js";
 
 class BooksController {
   static listBooks = async (req, res, next) => {
@@ -28,18 +28,31 @@ class BooksController {
 
   static searchBooks = async (req, res, next) => {
     try {
-      const { publisher, title } = req.query;
+      const { publisher, title, minPages, maxPages, writer } = req.query;
 
-      const newPublisher = publisher || "";
-      const newTitle = title || "";
+      let search = {};
 
-      const booksRes = await books.find({
-        publisher: { $regex: ".*" + newPublisher + ".*", $options: "i" },
-        title: { $regex: ".*" + newTitle + ".*", $options: "i" },
-      });
+      if (publisher)
+        search.publisher = { $regex: ".*" + publisher + ".*", $options: "i" };
+      if (title) search.title = { $regex: ".*" + title + ".*", $options: "i" };
+      if (minPages || maxPages) search.numberOfPages = {};
+      if (minPages) search.numberOfPages.$gte = minPages;
+      if (maxPages) search.numberOfPages.$lte = maxPages;
+      if (writer) {
+        const writerRes = await writers.findOne({ name: writer });
+
+        if (writer === null) return (search = null);
+
+        search.writer = writerRes?._id;
+      }
+
+      if (search === null) return res.status(200).send([]);
+
+      const booksRes = await books.find(search).populate("writer");
 
       return res.status(200).json(booksRes);
     } catch (err) {
+      console.log(err);
       next(err);
     }
   };
