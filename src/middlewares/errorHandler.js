@@ -1,19 +1,18 @@
 import mongoose from "mongoose";
 import BaseError from "../errors/BaseError.js";
-import IncorrectRequest from "../errors/IncorrectRequest.js";
+import BadRequest from "../errors/BadRequest.js";
 import ValidationError from "../errors/ValidationError.js";
-import NotFoundError from "../errors/NotFoundError.js";
 
 export function errorHandler(error, req, res, next) {
   if (error instanceof mongoose.Error.CastError) {
-    new IncorrectRequest().sendResponse(res);
+    new BadRequest().sendResponse(res);
   }
 
   if (error instanceof mongoose.Error.ValidationError) {
     return new ValidationError(error).sendResponse(res)
   }
 
-  if (error instanceof NotFoundError) {
+  if (error instanceof BaseError) {
     return error.sendResponse(res)
   }
 
