@@ -1,9 +1,10 @@
 import express from "express";
 import WritersController from "../controllers/writersController.js";
+import pagination from "../middlewares/pagination.js";
 
 const writersRouter = express.Router();
 
-writersRouter.get("/writers", WritersController.listWriters);
+writersRouter.get("/writers", WritersController.listWriters,  pagination);
 
 writersRouter.get("/writers/search", WritersController.searchWriters);
 

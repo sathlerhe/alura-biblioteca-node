@@ -4,9 +4,10 @@ import { writers } from "../models/index.js";
 class WritersController {
   static listWriters = async (req, res, next) => {
     try {
-      const writersRes = await writers.find();
+      const writersRes = writers.find();
+      req.result = writersRes;
 
-      res.status(200).json(writersRes);
+      next();
     } catch (err) {
       next(err);
     }

@@ -1,31 +1,14 @@
-import BadRequest from "../errors/BadRequest.js";
 import NotFoundError from "../errors/NotFoundError.js";
 import { books, writers } from "../models/index.js";
-
+ 
 class BooksController {
   static listBooks = async (req, res, next) => {
     try {
-      let { limit = 5, page = 1, ordenation = "_id:-1" } = req.query;
+      const booksRes = books.find().populate('writer')
 
-      let [sortBy, order] = ordenation.split(":");
+      req.result = booksRes
 
-      limit = parseInt(limit);
-      page = parseInt(page);
-      order = parseInt(order);
-
-      if (limit < 0 || page < 0) return next(new BadRequest());
-
-      const booksRes = await books
-        .find()
-        .sort({
-          [sortBy]: order,
-        })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .populate("writer")
-        .exec();
-
-      res.status(200).json(booksRes);
+      next()
     } catch (err) {
       next(err);
     }
@@ -67,9 +50,10 @@ class BooksController {
 
       if (search === null) return res.status(200).send([]);
 
-      const booksRes = await books.find(search).populate("writer");
+      const booksRes = books.find(search).populate("writer");
 
-      return res.status(200).json(booksRes);
+      req.result = booksRes
+      next()
     } catch (err) {
       console.log(err);
       next(err);
